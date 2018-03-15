@@ -23,6 +23,10 @@ function throwErrorOnRejection() {
   throw Error();
 }
 
+const setNextUpdateParams = (prevUpdateParams) => function(newParams) {
+  return Object.assign(prevUpdateParams, newParams); // assuming prevUpdateParams is always and object and corresponding new params too.
+}
+
 const setUpdateResponse = (updaterResponse, index, callback) => function setData(data) {
   updaterResponse[index] = data;
   callback(data);
@@ -40,19 +44,29 @@ const setUpdateResponse = (updaterResponse, index, callback) => function setData
    @param params.previousPromise: promise on which next then handler will be attached.
    @param params.index index on which update function will be called
  */
-const callUpdateFunc = (globalResolve, globalReject, initialValues, numOfUpdates, updaterResponse, updateConfigs, previousPromise, index) => {
+const callUpdateFunc = ({
+  globalResolve,
+  globalReject,
+  initialValues,
+  numOfUpdates,
+  updaterResponse,
+  updateParams,
+  updateConfigs,
+  previousPromise,
+  index
+}) => {
   const isLastUpdate = (numOfUpdates - 1) === index;
   previousPromise.then(() => {
     const {promise, resolve, reject} = isLastUpdate ? {} : createPromise();
     const {funcToExec, params} = updateConfigs[index].updater;
-    const funcPromise = _.isFunction(funcToExec) ? funcToExec(params, updaterResponse) : Promise.resolve();
+    const funcPromise = _.isFunction(funcToExec) ? funcToExec(params, updateParams, setNextUpdateParams(updateParams)) : Promise.resolve();
     if (isLastUpdate) {
       return funcPromise.then(globalResolve, throwErrorOnRejection);
     } else {
       funcPromise.then(setUpdateResponse(updaterResponse, index, resolve), throwErrorOnRejection);
     }
-    return callUpdateFunc(globalResolve, globalReject, initialValues, numOfUpdates, updaterResponse, updateConfigs, promise, index + 1);
-  }).catch(revertUpdate({updateConfigs, initialValues, updaterResponse, revertFromIndex: index, globalResolve, globalReject}));
+    return callUpdateFunc({globalResolve, globalReject, initialValues, numOfUpdates, updaterResponse, updateParams, updateConfigs, previousPromise: promise, index: index + 1});
+  }).catch(revertUpdate({updateConfigs, initialValues, updaterResponse, revertFromIndex: index, globalReject}));
 }
 
 /**
@@ -64,15 +78,31 @@ const callUpdateFunc = (globalResolve, globalReject, initialValues, numOfUpdates
    @param params.previousPromise: promise on which next then handler will be attached.
    @param params.index: index to revert
  */
-const callRevertFunc = (globalReject, initialValues, updaterResponse, updateConfigs, previousPromise, index) => {
+const callRevertFunc = ({
+  globalReject,
+  initialValues,
+  updaterResponse,
+  updateConfigs,
+  previousPromise,
+  index
+}) => {
   previousPromise.then(() => {
     const {promise, resolve, reject} = (index === 0) ? {} : createPromise();
     const {funcToExec} = updateConfigs[index].reverter;
     const paramsToSend = getRevertParams(updateConfigs[index].reverter, initialValues, updaterResponse);
     const funcPromise = _.isFunction(funcToExec) ? funcToExec(paramsToSend) : Promise.resolve();
     funcPromise.then(resolve, reject);
+
     return (index === 0) ? funcPromise.then(globalReject, throwErrorOnRejection) :
-      callRevertFunc(globalReject, initialValues, updaterResponse, updateConfigs, promise, index - 1)
+      callRevertFunc({
+        globalReject,
+        initialValues,
+        updaterResponse,
+        updateConfigs,
+        previousPromise: promise,
+        index: index - 1,
+      })
+
   }).catch(globalReject);
 }
 
@@ -85,13 +115,26 @@ const callRevertFunc = (globalReject, initialValues, updaterResponse, updateConf
    @param {callback} params.globalResolve: called when all the request are completed
    @param {callback} params.globalReject: called after reverting all the updates.
  */
-const revertUpdate = ({updateConfigs, initialValues, updaterResponse, revertFromIndex, globalResolve, globalReject}) => () => {
+const revertUpdate = ({
+  updateConfigs,
+  initialValues,
+  updaterResponse,
+  revertFromIndex,
+  globalReject
+}) => () => {
   if (revertFromIndex <= 0) {
     globalReject();
     return;
   }
   console.log('Reverting from index', revertFromIndex - 1);
-  callRevertFunc(globalReject, initialValues, updaterResponse, updateConfigs, Promise.resolve(), revertFromIndex - 1);
+  callRevertFunc({
+    globalReject,
+    initialValues,
+    updaterResponse,
+    updateConfigs,
+    previousPromise: Promise.resolve(),
+    index: revertFromIndex - 1
+  });
 }
 
 /**
@@ -120,13 +163,23 @@ const revertUpdate = ({updateConfigs, initialValues, updaterResponse, revertFrom
 const executeInSeries = (updateConfigs) => {
   let updaterResponse = [];
   const {promise, resolve, reject} = createPromise();
-  const valueGetters = _.map(updateConfigs, ({valueGetter: {}}) => {
+  const valueGetters = _.map(updateConfigs, ({valueGetter = {}}) => {
     const {funcToExec, params} = valueGetter;
     return _.isFunction(funcToExec) ? funcToExec(params) : Promise.resolve();
   });
   Promise.all(valueGetters).then((initialValues) => {
     const numOfUpdates = updateConfigs.length;
-    callUpdateFunc(resolve, reject, initialValues, numOfUpdates, updaterResponse, updateConfigs, Promise.resolve(), 0);
+    callUpdateFunc({
+      globalResolve: resolve,
+      globalReject: reject,
+      initialValues,
+      numOfUpdates,
+      updaterResponse,
+      updateParams: {},
+      updateConfigs,
+      previousPromise: Promise.resolve(),
+      index: 0
+    });
   }).catch((error) => {
     console.log(error);
     reject(error);

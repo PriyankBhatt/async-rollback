@@ -1,0 +1,23 @@
+{
+  "name": "node-with-revert",
+  "version": "1.0.0",
+  "description": "A simple util to make reverting easy in complex nested promises",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PriyankBhatt/withRevert.git"
+  },
+  "author": "Priyank Bhatt",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PriyankBhatt/withRevert/issues"
+  },
+  "homepage": "https://github.com/PriyankBhatt/withRevert#readme",
+  "dependencies": {
+    "bluebird": "^3.5.1",
+    "lodash": "^4.17.5"
+  }
+}
