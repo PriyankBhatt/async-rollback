@@ -2,10 +2,9 @@
 
 A simple util to make reverting easy in complex nested promises.
 
-Every now and then we have a problem wherein we db/micro service call depends on eachother
+Every now and then we have a problem wherein db/micro service call depends on each other
 For eg.
 
-create a collection and on success update second collection. so out functions start nesting like
 ```javascript
 
 function updateSomeDoc2() {
@@ -16,11 +15,11 @@ function updateSomeDoc3() {
   return call() // call some async api/db call
 }
 
-func1().then(updateSomeDoc2).then(updateSomeDoc3)
+updateSomeDoc1().then(updateSomeDoc2).then(updateSomeDoc3)
 ```
 
 This seems fine but over here we forgot if updateSomeDoc3 fails we need to revert updateSomeDoc2
-changes as well as func1 update.This library provides a much better interface to solve this issue.
+changes as well as updateSomeDoc1 update, this library provides a much better interface to solve this issue.
 
 Features
 
