@@ -25,6 +25,8 @@ Features
 
   - Can be used to nest multiple update/create call which depend on each other
   - Can be used for reverting update/create calls with update/delete call
+  - update function can set what it needs to give child just like async waterfall
+  - reverter can either receive it's own params or update's response or it can use valueGetter's response.
 
 ### Example
 ```sh
@@ -43,12 +45,14 @@ import executeInSeries from 'node-with-revert';
 
 const updateObj = [
   {
+    valueGetter: {funcToExec: () => Promise.resolve(), params: {}},
     updater: {funcToExec: () => Promise.resolve(), params: {} },
-    reverter: {funcToExec: () => Promise.resolve(), params: {}}
+    reverter: {funcToExec: () => Promise.resolve(), params: {}, useUpdaterResponse: false, useValueGetterResponse: false}
   },
   {
+    valueGetter: {funcToExec: () => Promise.resolve(), params: {}},
     updater: {funcToExec: () => Promise.reject(), params: {} },
-    reverter: {funcToExec: () => Promise.resolve(), params: {}}
+    reverter: {funcToExec: () => Promise.resolve(), params: {}, useUpdaterResponse: false, useValueGetterResponse: false}
   }
 ];
 

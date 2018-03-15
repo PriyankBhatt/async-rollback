@@ -10,11 +10,11 @@ function createPromise() {
   return {promise, resolve, reject};
 }
 
-function getRevertParams({useValueGetterResponse, useUpdaterResponse, params}, initialValues, updaterResponse) {
+function getRevertParams({useValueGetterResponse, useUpdaterResponse, params}, initialValue, updateResponse) {
   if (useValueGetterResponse) {
-    return initialValues[reversedIndex];
+    return initialValue;
   } else if (useUpdaterResponse) {
-    return updaterResponse[reversedIndex];
+    return updateResponse;
   }
   return params;
 }
@@ -89,7 +89,7 @@ const callRevertFunc = ({
   previousPromise.then(() => {
     const {promise, resolve, reject} = (index === 0) ? {} : createPromise();
     const {funcToExec} = updateConfigs[index].reverter;
-    const paramsToSend = getRevertParams(updateConfigs[index].reverter, initialValues, updaterResponse);
+    const paramsToSend = getRevertParams(updateConfigs[index].reverter, initialValues[index], updaterResponse[index]);
     const funcPromise = _.isFunction(funcToExec) ? funcToExec(paramsToSend) : Promise.resolve();
     funcPromise.then(resolve, reject);
 
