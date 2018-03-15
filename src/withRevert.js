@@ -45,7 +45,7 @@ const callUpdateFunc = (globalResolve, globalReject, initialValues, numOfUpdates
   previousPromise.then(() => {
     const {promise, resolve, reject} = isLastUpdate ? {} : createPromise();
     const {funcToExec, params} = updateConfigs[index].updater;
-    const funcPromise = _.isFunction(funcToExec) ? funcToExec(params) : Promise.resolve();
+    const funcPromise = _.isFunction(funcToExec) ? funcToExec(params, updaterResponse) : Promise.resolve();
     if (isLastUpdate) {
       return funcPromise.then(globalResolve, throwErrorOnRejection);
     } else {
