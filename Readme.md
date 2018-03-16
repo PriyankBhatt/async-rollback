@@ -38,11 +38,11 @@ $ node rollbackWithTransaction // rollback using transaction response
 ```
 
 ### Installation
-``npm install async-rollback --save``
+``npm install node-async-rollback --save``
 
 ### Usage
 ```javascript
-import asyncRollback from 'async-rollback';
+import asyncRollback from 'node-async-rollback';
 
 const updateObj = [
   {

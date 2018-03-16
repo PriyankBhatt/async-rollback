@@ -1,6 +1,6 @@
 {
-  "name": "async-rollback",
-  "version": "1.0.0",
+  "name": "node-async-rollback",
+  "version": "0.0.1",
   "description": "A simple util to make rollback easy in complex nested promises",
   "main": "index.js",
   "scripts": {
