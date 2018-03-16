@@ -1,5 +1,5 @@
 const _ = require('lodash');
-const executeInSeries = require('../src/withRevert');
+const asyncRollback = require('../src/withRevert');
 let collection1 = {};
 let collection2 = {1: { collection1: []  }  };
 
@@ -26,20 +26,20 @@ const updateCollection2 = (params) => {
 
 const updateObj = [
   {
-    updater: {funcToExec: createDocInCollection1, params: {id: 1} },
-    reverter: {funcToExec: deleteDocInCollection1, params: {id: 1} },
+    transaction: {funcToExec: createDocInCollection1, params: {id: 1} },
+    rollback: {funcToExec: deleteDocInCollection1, params: {id: 1} },
   },
   {
-    updater: {funcToExec: updateCollection2, params: {id: 1, collection2Id: 1} },
+    transaction: {funcToExec: updateCollection2, params: {id: 1, collection2Id: 1} },
   }
 ];
 
 
-executeInSeries(updateObj).catch(() => {
+asyncRollback(updateObj).catch(() => {
   // although 1st function was successful 2nd function lead to an error
   // so util called 1st function revert method and it reverted collection1
 
   // hence updated collections are
-  // collection1: { '1': { id: 1 } }
-  // collection2: { '1': { collection1: [ 1 ] } }
+  // collection1: { }
+  // collection2: { '1': { collection1: [] } }
 });

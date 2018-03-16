@@ -1,3 +1,3 @@
-const executeInSeries = require('./src/withRevert');
+const asyncRollback = require('./src/withRevert');
 
-module.exports = executeInSeries;
+module.exports = asyncRollback;

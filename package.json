@@ -1,7 +1,7 @@
 {
-  "name": "node-with-revert",
+  "name": "async-rollback",
   "version": "1.0.0",
-  "description": "A simple util to make reverting easy in complex nested promises",
+  "description": "A simple util to make rollback easy in complex nested promises",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

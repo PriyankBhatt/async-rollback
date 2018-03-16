@@ -1,4 +1,4 @@
-const executeInSeries = require('../src/withRevert');
+const asyncRollback = require('../src/withRevert');
 let collection1 = {};
 let collection2 = {1: { collection1: []  }  };
 
@@ -20,15 +20,15 @@ const updateCollection2 = (params) => {
 
 const updateObj = [
   {
-    updater: {funcToExec: createDocInCollection1, params: {id: 1} },
+    transaction: {funcToExec: createDocInCollection1, params: {id: 1} },
   },
   {
-    updater: {funcToExec: updateCollection2, params: {id: 1, collection2Id: 1} },
+    transaction: {funcToExec: updateCollection2, params: {id: 1, collection2Id: 1} },
   }
 ];
 
 
-executeInSeries(updateObj).then(() => {
+asyncRollback(updateObj).then(() => {
   // updated objects will be
   // collection1: { '1': { id: 1 } }
   // collection2: { '1': { collection1: [ 1 ] } }

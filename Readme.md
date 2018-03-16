@@ -1,6 +1,6 @@
-# node-with-revert
+# async-rollback
 
-A simple util to make reverting easy in complex nested promises.
+A simple util to make rollback easy in complex nested promises.
 
 Every now and then we have a problem wherein db/micro service call depends on each other
 For eg.
@@ -24,9 +24,9 @@ changes as well as updateSomeDoc1 update, this library provides a much better in
 Features
 
   - Can be used to nest multiple update/create call which depend on each other
-  - Can be used for reverting update/create calls with update/delete call
-  - update function can set what it needs to give child just like async waterfall
-  - reverter can either receive it's own params or update's response or it can use valueGetter's response.
+  - Can be used to rollback update/create calls using update/delete call
+  - transaction function can set what it needs to give child just like async waterfall
+  - rollback receive it's own params as well as update's response.
 
 ### Example
 ```sh
@@ -37,26 +37,24 @@ $ node revert   // know how revert happens
 ```
 
 ### Installation
-``npm install node-with-revert --save``
+``npm install async-rollback --save``
 
 ### Usage
 ```javascript
-import executeInSeries from 'node-with-revert';
+import asyncRollback from 'async-rollback';
 
 const updateObj = [
   {
-    valueGetter: {funcToExec: () => Promise.resolve(), params: {}},
-    updater: {funcToExec: () => Promise.resolve(), params: {} },
-    reverter: {funcToExec: () => Promise.resolve(), params: {}, useUpdaterResponse: false, useValueGetterResponse: false}
+    transaction: {funcToExec: () => Promise.resolve(), params: {} },
+    rollback: {funcToExec: () => Promise.resolve(), params: {}}
   },
   {
-    valueGetter: {funcToExec: () => Promise.resolve(), params: {}},
-    updater: {funcToExec: () => Promise.reject(), params: {} },
-    reverter: {funcToExec: () => Promise.resolve(), params: {}, useUpdaterResponse: false, useValueGetterResponse: false}
+    transaction: {funcToExec: () => Promise.reject(), params: {} },
+    rollback: {funcToExec: () => Promise.resolve(), params: {}}
   }
 ];
 
-executeInSeries(updateObj).then(onSuccess).catch(onError);
+asyncRollback(updateObj).then(onSuccess).catch(onError);
 //...
 ```
 
