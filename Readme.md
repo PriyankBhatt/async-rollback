@@ -26,14 +26,15 @@ Features
   - Can be used to nest multiple update/create call which depend on each other
   - Can be used to rollback update/create calls using update/delete call
   - transaction function can set what it needs to give child just like async waterfall
-  - rollback receive it's own params as well as update's response.
+  - rollback receives own params and it's transaction response.
 
 ### Example
 ```sh
 $ npm i
 $ cd examples
 $ node basic   // For basic nest calls
-$ node revert   // know how revert happens
+$ node rollback   // know how rollback happens
+$ node rollbackWithTransaction // rollback using transaction response
 ```
 
 ### Installation

@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/PriyankBhatt/withRevert.git"
+    "url": "git+https://github.com/PriyankBhatt/async-rollback.git"
   },
   "author": "Priyank Bhatt",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/PriyankBhatt/withRevert/issues"
+    "url": "https://github.com/PriyankBhatt/async-rollback/issues"
   },
-  "homepage": "https://github.com/PriyankBhatt/withRevert#readme",
+  "homepage": "https://github.com/PriyankBhatt/async-rollback#readme",
   "dependencies": {
     "bluebird": "^3.5.1",
     "lodash": "^4.17.5"
