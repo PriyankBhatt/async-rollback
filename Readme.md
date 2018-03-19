@@ -15,11 +15,34 @@ function updateSomeDoc3() {
   return call() // call some async api/db call
 }
 
-updateSomeDoc1().then(updateSomeDoc2).then(updateSomeDoc3)
+updateSomeDoc1().then(updateSomeDoc2).then(updateSomeDoc3).catch(onError);
+```
+This seems fine but during db/ micro service calls we need to make sure whenever updateSomeDoc3 fails, updateSomeDoc2, updateSomeDoc1 should be reverted but their is only catch method onError which would only identify something wrong happened while executing either updateSomeDoc1, updateSomeDoc2, updateSomeDoc3. So to know error a particular method we would generally do is
+
+```javascript
+
+function onUpdateFailedDoc1() {
+  throw Error('')
+}
+
+function onUpdateFailedDoc2() {
+  onUpdateFailedDoc1(); // revert first doc function
+  throw Error('')
+}
+
+function onUpdateFailedDoc3() {
+  onUpdateFailedDoc2(); // revert second update
+  onUpdateFailedDoc1(); // revert first update
+  throw Error('')
+}
+
+function onError() {
+}
+
+updateSomeDoc1().then(updateSomeDoc2, onUpdateFailedDoc1).then(updateSomeDoc3, onUpdateFailedDoc2).then(onSuccess, onUpdateFailedDoc3).catch(onError);
 ```
 
-This seems fine but over here we forgot if updateSomeDoc3 fails we need to revert updateSomeDoc2
-changes as well as updateSomeDoc1 update, this library provides a much better interface to solve this issue.
+This chaining increases as we go deeper in nesting hence most of the time it's difficult to write rollback methods. This library provides a much better readable api to solve this issue wherein each rollback method tries only to rollback it's transaction rather than rollbacking n-1 transactions above it.
 
 Features
 
