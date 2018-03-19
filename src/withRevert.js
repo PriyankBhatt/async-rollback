@@ -130,12 +130,12 @@ const revertUpdate = ({
 
   [
     {
-      transaction: {funcToExec: '', params:  {} },
-      rollback: {funcToExec: '', params:  {}, useUpdaterResponse: false}
+      transaction: {funcToExec: '', params:  {}},
+      rollback: {funcToExec: '', params:  {}}
     },
     {
-      transaction: {funcToExec: '', params:  {} },
-      rollback: {funcToExec: '', params:  {}, useUpdaterResponse: false}
+      transaction: {funcToExec: '', params:  {}},
+      rollback: {funcToExec: '', params:  {}}
     }
   ]
  */
